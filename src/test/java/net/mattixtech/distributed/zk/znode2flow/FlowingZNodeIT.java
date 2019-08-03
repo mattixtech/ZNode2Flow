@@ -1,6 +1,8 @@
 package net.mattixtech.distributed.zk.znode2flow;
 
 import static org.awaitility.Awaitility.await;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +17,7 @@ import org.junit.Test;
  * @author <a href="mailto:matt@mattixtech.net">Matt Brooks</a>
  */
 public class FlowingZNodeIT {
-    TestingServer testingServer = new TestingServer();
+    private final TestingServer testingServer = new TestingServer();
     private String testConnectionString;
 
     public FlowingZNodeIT() throws Exception {
@@ -28,8 +30,7 @@ public class FlowingZNodeIT {
 
     @Test
     public void canReceiveSubmission() {
-        FlowingZNode flowingZNode = new FlowingZNode(FlowingZNode.startedCurator(testConnectionString),
-                "/testing", "/lock");
+        FlowingZNode flowingZNode = FlowingZNode.withCachedCurator(testConnectionString, "/canReceiveSubmission");
 
         Subscriber s = new Subscriber();
         flowingZNode.subscribe(s);
@@ -38,12 +39,12 @@ public class FlowingZNodeIT {
         flowingZNode.submit(val.getBytes());
 
         await().atMost(5, TimeUnit.SECONDS).until(() -> s.getReceived().get(0).equals(val));
+        flowingZNode.close();
     }
 
     @Test
     public void canReceiveAllSubmissions() {
-        FlowingZNode flowingZNode = new FlowingZNode(FlowingZNode.startedCurator(testConnectionString),
-                "/testing", "/lock");
+        FlowingZNode flowingZNode = FlowingZNode.withCachedCurator(testConnectionString, "/canReceiveAllSubmissions");
 
         Subscriber s1 = new Subscriber();
         Subscriber s2 = new Subscriber();
@@ -51,13 +52,19 @@ public class FlowingZNodeIT {
         flowingZNode.subscribe(s2);
 
         List<String> toSubmit = List.of("a", "b", "c", "d");
-        toSubmit.forEach(str -> flowingZNode.submit(str.getBytes()));
+        toSubmit.forEach(str -> {
+            flowingZNode.submit(str.getBytes());
+            // Wait so that each subscriber can see every change
+            await().atMost(1, TimeUnit.SECONDS).until(() -> s1.getReceived().contains(str) &&
+                    s2.getReceived().contains(str));
+        });
 
-        await().atMost(5, TimeUnit.SECONDS).until(() -> s1.getReceived().equals(toSubmit) &&
-                s2.getReceived().equals(toSubmit));
+        assertThat(s1.getReceived(), equalTo(toSubmit));
+        assertThat(s2.getReceived(), equalTo(toSubmit));
+        flowingZNode.close();
     }
 
-    private class Subscriber implements Flow.Subscriber<byte[]> {
+    private static class Subscriber implements Flow.Subscriber<byte[]> {
         private List<String> received = new ArrayList<>();
         private Flow.Subscription subscription;
         private boolean completed;

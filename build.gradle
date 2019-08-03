@@ -4,14 +4,11 @@ plugins {
     id 'maven-publish'
 }
 
-def groupId = 'net.mattixtech'
-def artifactId = 'znode2flow'
-def versionNumber = '0.1-SNAPSHOT'
-
-group groupId
-version versionNumber
+group 'net.mattixtech'
+version '0.1-SNAPSHOT'
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
@@ -28,21 +25,14 @@ compileJava {
 }
 
 test {
-    filter {
-        includeTestsMatching '*Test'
-        includeTestsMatching '*IT'
-    }
     useJUnit()
     maxHeapSize = '1G'
 }
 
 publishing {
     publications {
-        maven(MavenPublication) {
-            groupId = groupId
-            artifactId = artifactId
-            version = versionNumber
-
+        mavenJava(MavenPublication) {
+            artifactId = 'znode2flow'
             from components.java
         }
     }
