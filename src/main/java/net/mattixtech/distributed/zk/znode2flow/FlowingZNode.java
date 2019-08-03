@@ -24,7 +24,7 @@ import com.google.common.base.Strings;
  */
 public class FlowingZNode implements Flow.Publisher<byte[]> {
     private final SubmissionPublisher<byte[]> publisher = new SubmissionPublisher<>(new ForkJoinPool(Math.max(1,
-            Runtime.getRuntime().availableProcessors())), Flow.defaultBufferSize());
+            Runtime.getRuntime().availableProcessors() - 1)), Flow.defaultBufferSize());
     private final CuratorFramework curator;
     private final NodeCache nodeCache;
     private final String zkPath;
