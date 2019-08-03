@@ -76,6 +76,10 @@ public class FlowingZNode implements Flow.Publisher<byte[]> {
     public synchronized void submit(byte[] newValue) {
         try {
             // Upsert by making sure the path is created already
+            //
+            // Note the upsert here is not fully atomic. If the ZNode is deleted between mkdirs() and
+            // setData() an exception will be thrown. It is up to the user to guard their calls to submit()
+            // and any deletes of this node with a ZooKeeper lock.
             ZKPaths.mkdirs(curator.getZookeeperClient().getZooKeeper(), zkPath);
             curator.setData().forPath(zkPath, newValue);
         } catch (Exception e) {
