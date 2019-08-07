@@ -22,7 +22,7 @@ import com.google.common.base.Strings;
 /**
  * @author <a href="mailto:matt@mattixtech.net">Matt Brooks</a>
  */
-public class FlowingZNode implements Flow.Publisher<byte[]> {
+public class ZNodePublisher implements Flow.Publisher<byte[]> {
     private final SubmissionPublisher<byte[]> publisher = new SubmissionPublisher<>(new ForkJoinPool(Math.max(1,
             Runtime.getRuntime().availableProcessors() - 1)), Flow.defaultBufferSize());
     private final CuratorFramework curator;
@@ -30,7 +30,7 @@ public class FlowingZNode implements Flow.Publisher<byte[]> {
     private final String zkPath;
     private static final Map<String, CuratorFramework> cachedCurators = new HashMap<>();
 
-    private FlowingZNode(CuratorFramework curator, String zkPath) {
+    private ZNodePublisher(CuratorFramework curator, String zkPath) {
         this.curator = Objects.requireNonNull(curator);
         this.zkPath = PathUtils.validatePath(zkPath);
 
@@ -48,12 +48,12 @@ public class FlowingZNode implements Flow.Publisher<byte[]> {
         }
     }
 
-    public static FlowingZNode withCachedCurator(String connectionString, String zkPath) {
-        return new FlowingZNode(startCachedCurator(connectionString), zkPath);
+    public static ZNodePublisher withCachedCurator(String connectionString, String zkPath) {
+        return new ZNodePublisher(startCachedCurator(connectionString), zkPath);
     }
 
-    public static FlowingZNode withProvidedCurator(CuratorFramework curator, String zkPath) {
-        return new FlowingZNode(curator, zkPath);
+    public static ZNodePublisher withProvidedCurator(CuratorFramework curator, String zkPath) {
+        return new ZNodePublisher(curator, zkPath);
     }
 
     private synchronized static CuratorFramework startCachedCurator(String zkConnectionString) {

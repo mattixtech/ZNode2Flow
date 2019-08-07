@@ -4,13 +4,13 @@ ZNode2Flow is a Java library for watching a ZooKeeper node via a reactive stream
 # Usage
 To subscribe to the stream:
 ```
-Flow.Publisher<byte[]> publisher = FlowingZNode.withCachedCurator(myZkConnection, myZkPath);
+Flow.Publisher<byte[]> publisher = ZNodePublisher.withCachedCurator(myZkConnection, myZkPath);
 publisher.subscribe(mySubscriber);
 ```
 
 To submit to the stream:
 ```
-FlowingZNodeIT zNode = FlowingZNode.withCachedCurator(myZkConnection, myZkPath);
+FlowingZNodeIT zNode = ZNodePublisher.withCachedCurator(myZkConnection, myZkPath);
 zNode.submit(mySubmission);
 ```
 

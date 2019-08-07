@@ -16,11 +16,11 @@ import org.junit.Test;
 /**
  * @author <a href="mailto:matt@mattixtech.net">Matt Brooks</a>
  */
-public class FlowingZNodeIT {
+public class ZNodePublisherIT {
     private final TestingServer testingServer = new TestingServer();
     private String testConnectionString;
 
-    public FlowingZNodeIT() throws Exception {
+    public ZNodePublisherIT() throws Exception {
     }
 
     @Before
@@ -30,30 +30,30 @@ public class FlowingZNodeIT {
 
     @Test
     public void canReceiveSubmission() {
-        FlowingZNode flowingZNode = FlowingZNode.withCachedCurator(testConnectionString, "/canReceiveSubmission");
+        ZNodePublisher zNodePublisher = ZNodePublisher.withCachedCurator(testConnectionString, "/canReceiveSubmission");
 
         Subscriber s = new Subscriber();
-        flowingZNode.subscribe(s);
+        zNodePublisher.subscribe(s);
 
         String val = "Hello World!";
-        flowingZNode.submit(val.getBytes());
+        zNodePublisher.submit(val.getBytes());
 
         await().atMost(5, TimeUnit.SECONDS).until(() -> s.getReceived().get(0).equals(val));
-        flowingZNode.close();
+        zNodePublisher.close();
     }
 
     @Test
     public void canReceiveAllSubmissions() {
-        FlowingZNode flowingZNode = FlowingZNode.withCachedCurator(testConnectionString, "/canReceiveAllSubmissions");
+        ZNodePublisher zNodePublisher = ZNodePublisher.withCachedCurator(testConnectionString, "/canReceiveAllSubmissions");
 
         Subscriber s1 = new Subscriber();
         Subscriber s2 = new Subscriber();
-        flowingZNode.subscribe(s1);
-        flowingZNode.subscribe(s2);
+        zNodePublisher.subscribe(s1);
+        zNodePublisher.subscribe(s2);
 
         List<String> toSubmit = List.of("a", "b", "c", "d");
         toSubmit.forEach(str -> {
-            flowingZNode.submit(str.getBytes());
+            zNodePublisher.submit(str.getBytes());
             // Wait so that each subscriber can see every change
             await().atMost(1, TimeUnit.SECONDS).until(() -> s1.getReceived().contains(str) &&
                     s2.getReceived().contains(str));
@@ -61,7 +61,7 @@ public class FlowingZNodeIT {
 
         assertThat(s1.getReceived(), equalTo(toSubmit));
         assertThat(s2.getReceived(), equalTo(toSubmit));
-        flowingZNode.close();
+        zNodePublisher.close();
     }
 
     private static class Subscriber implements Flow.Subscriber<byte[]> {
