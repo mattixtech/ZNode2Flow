@@ -20,7 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 /**
- * @author <a href="mailto:matt@mattixtech.net">Matt Brooks</a>
+ * @author Matt Brooks
  */
 public class ZNodePublisher implements Flow.Publisher<byte[]> {
     private final SubmissionPublisher<byte[]> publisher = new SubmissionPublisher<>(new ForkJoinPool(Math.max(1,

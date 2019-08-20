@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * @author <a href="mailto:matt@mattixtech.net">Matt Brooks</a>
+ * @author Matt Brooks
  */
 public class ZNodePublisherIT {
     private final TestingServer testingServer = new TestingServer();
@@ -44,7 +44,8 @@ public class ZNodePublisherIT {
 
     @Test
     public void canReceiveAllSubmissions() {
-        ZNodePublisher zNodePublisher = ZNodePublisher.withCachedCurator(testConnectionString, "/canReceiveAllSubmissions");
+        ZNodePublisher zNodePublisher = ZNodePublisher.withCachedCurator(testConnectionString, 
+                "/canReceiveAllSubmissions");
 
         Subscriber s1 = new Subscriber();
         Subscriber s2 = new Subscriber();
