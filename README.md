@@ -26,7 +26,7 @@ Submitting a value to the publisher will write the value to the corresponding ZN
 will then see the new value.
 
 ## Building
-### With Tests
+### Build
 `./gradlew build`
 
 ### Publish to local Maven repo
