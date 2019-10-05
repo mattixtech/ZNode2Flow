@@ -1,8 +1,5 @@
 # ZNode2Flow
-ZNode2Flow is a Java library for watching a ZooKeeper node via a reactive stream. 
-
-# WIP
-This project is a work in progress.
+ZNode2Flow is a Java library for watching a ZooKeeper node via a reactive stream.
 
 # Usage
 ## Subscribing
